@@ -1,0 +1,96 @@
+---
+title: "Introdução ao sidrar"
+author: "Wellington Santos Souza"
+format: html
+editor: visual
+---
+
+## Introdução
+
+Esse tutorial tem como objetivo mostar como podemos acessar de forma fácil os dados disponíveis no **SIDRA** com o auxílio da linguagem estatística R. Bem como, mostrar alguns exemplos apresentando tabelas e gráficos.
+
+## SIDRA
+
+O SIDRA permite consultar informações de todos os indicadores econômicos conjunturais (como os de trabalho e rendimento, inflação, indústria, comércio, serviços, agropecuária e o PIB) e suas séries históricas. Também dá acesso aos resultados de quase todas as pesquisas estruturais do IBGE, inclusive o Censo Demográfico, a Pesquisa Nacional por Amostra de Domicílios (PNAD), a Pesquisa de Orçamentos Familiares (POF), a Pesquisa Nacional de Saúde (PNS) e as pesquisas econômicas anuais.
+
+O acesso ao website do SIDRA é feito pelo endereço [**http://sidra.ibge.gov.br**](http://sidra.ibge.gov.br/). A aplicação também dispõe de uma API (Interface de Programação de Aplicação), que permite a extração dos dados utilizando programas e aplicativos web, pelo endereço [**http://api.sidra.ibge.gov.br**](http://api.sidra.ibge.gov.br/).
+
+Fonte: [Agência IBGE](https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/9481-novo-sidra-permite-consultar-facilmente-dados-de-estudos-e-pesquisas-do-ibge-tambem-em-dispositivos-moveis#:~:text=O%20SIDRA%20permite%20consultar%20informa%C3%A7%C3%B5es,PIB)
+
+Os dados disponíveis no SIDRA podem ser acessado com o axílio da linguagem estatística R, com o auxílio do pacote **sidrar.**
+
+## sidrar
+
+O pacote R "sidrar" busca fornecer acesso direto aos dados do SIDRA - Sistema IBGE de Recuperação Automática - dentro do ambiente R de forma fácil e flexível.
+
+### Instalando e carregando o pacote sidrar
+
+Para instalar e carregar a versão disponível no CRAN:
+
+```{r}
+#| message: false
+if(!require(sidrar)){install.packages("sidrar")};library(sidrar)
+# pacote utilizado para manipular os dados
+if(!require(tidyverse)){install.packages("tidyverse")};library(tidyverse)
+options(scipen = 999)
+```
+
+### Funções
+
+Obter tabelas do SIDRA
+
+```{r}
+?get_sidra
+```
+
+Listando todos os parâmetros de uma tabela do SIDRA
+
+```{r}
+?info_sidra 
+```
+
+Pesquise nas tabelas do SIDRA com termo(s) específicos
+
+```{r}
+?search_sidra  
+```
+
+### Exemplos
+
+#### get_sidra
+
+Vamos supor que queremos o Produto Interno Bruto a preços correntes (Mil Reais) para o estado de São Paulo nos últimos 10 anos.
+
+Para isso basta executar:
+
+```{r}
+#| message: false
+pib <- get_sidra(x = 5938,
+          period = c("last" = 10),
+          variable = 37,
+          geo = "State",
+          geo.filter = 	35,
+          header = T,
+          format = 3) %>% 
+  select(Valor, Ano)
+```
+
+Gráfico com o valor do PIB a Preços correntes para o estado de São Paulo
+
+```{r}
+pib %>% 
+  ggplot(mapping = aes(x=Ano,y=Valor, group = 1))+
+  geom_line(color = "red")+
+  geom_point(color = "blue")+
+  labs(title = "PIB a Preços correntes para o estado de São Paulo",
+       subtitle = "2010-2019",
+       x="Ano",
+       y=NULL,
+       caption = "Fonte: IBGE")+
+  geom_text(aes(x = Ano, y = Valor, label = paste0(Valor)),
+                        vjust = -0.15, size = 2.5)+
+  theme(plot.title = element_text(size=12),axis.text.x= element_text(size=12),
+                            axis.text.y= element_text(size=8), axis.title=element_text(size=6))+
+  theme_grey()
+  
+```
