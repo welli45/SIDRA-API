@@ -59,7 +59,7 @@ Pesquise nas tabelas do SIDRA com termo(s) específicos
 
 #### get_sidra
 
-Vamos supor que queremos o Produto Interno Bruto a preços correntes (Mil Reais) para o estado de São Paulo nos últimos 10 anos.
+Vamos supor que queremos o Produto Interno Bruto a preços correntes (Mil Reais) para o estado da Bahia nos últimos 10 anos.
 
 Para isso basta executar:
 
@@ -69,20 +69,19 @@ pib <- get_sidra(x = 5938,
           period = c("last" = 10),
           variable = 37,
           geo = "State",
-          geo.filter = 	35,
+          geo.filter = 29,
           header = T,
-          format = 3) %>% 
-  select(Valor, Ano)
+          format = 3)
 ```
 
-Gráfico com o valor do PIB a Preços correntes para o estado de São Paulo
+Gráfico com o valor do PIB a Preços correntes para o estado da Bahia
 
 ```{r}
 pib %>% 
   ggplot(mapping = aes(x=Ano,y=Valor, group = 1))+
   geom_line(color = "red")+
   geom_point(color = "blue")+
-  labs(title = "PIB a Preços correntes para o estado de São Paulo",
+  labs(title = "PIB a Preços correntes para o estado da Bahia",
        subtitle = "2010-2019",
        x="Ano",
        y=NULL,
@@ -94,3 +93,19 @@ pib %>%
   theme_grey()
   
 ```
+
+Utililzando a API da tabela para obter as mesmas informações
+
+```{r}
+get_sidra(api = "")
+```
+
+#### info_sidra
+
+Listando todos os parâmetros da Tabela 5938: Produto interno bruto a preços correntes, impostos, líquidos de subsídios, sobre produtos a preços correntes e valor adicionado bruto a preços correntes total e por atividade econômica, e respectivas participações - Referência 2010.
+
+```{r}
+info_sidra(5938)
+```
+
+#### 
